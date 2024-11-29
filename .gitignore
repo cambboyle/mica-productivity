@@ -1,0 +1,41 @@
+# Node.js dependencies
+node_modules/
+/frontend/node_modules
+
+# dotenv environment variables file
+.env
+
+# Logs
+*.log
+
+# IDE configurations (for Cursor IDE, VSCode, or others)
+.idea/
+.vscode/
+
+# OS-specific files
+Thumbs.db    # Windows specific
+
+# Build directories (for React or other frontend build files)
+build/
+dist/
+
+# Temporary files
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript compiled files (if you are using TypeScript)
+*.tsbuildinfo
+
+# Coverage directory for tests
+coverage/
+
+# Any generated folders like database files, session files, etc.
+*.db
+*.sqlite
