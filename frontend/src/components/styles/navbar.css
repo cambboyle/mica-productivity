@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+
 .navbar {
     background-color: #f8f9fa;
     padding: 10px 20px;
@@ -20,3 +23,22 @@
     text-decoration: none;
     color: #007bff;
   }
+
+  .navbar-title {
+    display: flex;
+    align-items: flex-end;
+    font-family: Pacifico, serif;
+  }
+
+  .navbar-title-bold {
+    font-weight: bold;
+    font-size: 2em;
+    line-height: 1;
+  }
+
+  .navbar-title-small {
+    font-size: 0.8em;
+    margin-left: 5px;
+    line-height: 1;
+  }
+  

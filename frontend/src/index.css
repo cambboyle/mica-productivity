@@ -12,17 +12,28 @@ h3 {
   font-weight: 600;
 }
 
-button {
-  background-color: #3b82f6; /* Blue button */
-  color: white;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
+/* General Button Styles */
+.button {
+  padding: 10px 15px;
+  border: none; /* Remove default border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for background and shadow */
+  background-color: #ffffff; /* White background */
+  color: #333; /* Dark text color */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  font-weight: 500; /* Medium font weight */
 }
 
-button:hover {
-  background-color: #2563eb; /* Darker blue for hover effect */
+.button:hover {
+  background-color: #f0f0f0; /* Light gray background on hover */
+  color: #000; /* Darker text color on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on hover */
+}
+
+.button:active {
+  background-color: #e0e0e0; /* Darker gray background on active */
+  box-shadow: none; /* Remove shadow on active */
 }
 
 input,

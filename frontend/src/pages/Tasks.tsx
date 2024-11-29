@@ -1,4 +1,3 @@
-// src/pages/Tasks.tsx
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import TaskForm from "../components/TaskForm";
@@ -101,6 +100,18 @@ const Tasks = () => {
     });
   };
 
+  const handleDeleteTask = async () => {
+    if (editingTask) {
+      try {
+        await api.delete(`/tasks/${editingTask.id}`);
+        setTasks(tasks.filter((task) => task.id !== editingTask.id));
+        handleCancelEdit();
+      } catch (error) {
+        console.error("Error deleting task:", error);
+      }
+    }
+  };
+
   if (loading) return <p>Loading tasks...</p>;
 
   return (
@@ -112,6 +123,7 @@ const Tasks = () => {
         handleSubmit={handleSubmit}
         editingTask={editingTask}
         handleCancelEdit={handleCancelEdit}
+        handleDeleteTask={handleDeleteTask}
       />
       <TaskFilters filter={filter} handleFilterChange={handleFilterChange} />
       <TaskList filteredTasks={filteredTasks} handleEdit={handleEdit} />

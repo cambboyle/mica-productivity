@@ -1,0 +1,29 @@
+.filter-container {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    padding: 10px;
+    margin: 10px auto;
+    max-width: 600px;
+}
+
+.filter-title {
+    font-size: 20px;
+    margin-right: 20px;
+    text-align: center;
+}
+
+.filter-label {
+    margin: 0 5px;
+    font-weight: 500;
+}
+
+.filter-select {
+    padding: 10px;
+    margin: 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #333;
+    font-size: 14px;
+}
