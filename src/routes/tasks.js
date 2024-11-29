@@ -40,6 +40,26 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET: Fetch tasks with optional filters
+router.get("/", async (req, res) => {
+  try {
+    const { priority, status } = req.query; // Get filter values from query parameters
+    let filterConditions = {};
+
+    if (priority) filterConditions.priority = priority;
+    if (status) filterConditions.status = status;
+
+    const tasks = await Task.findAll({
+      where: filterConditions, // Apply filtering based on conditions
+    });
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    res.status(500).json({ error: "Failed to fetch tasks" });
+  }
+});
+
 // PUT: Update task status
 router.put("/:id", async (req, res) => {
   try {
