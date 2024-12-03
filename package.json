@@ -8,6 +8,10 @@
     "client": "cd frontend && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
+  "engines": {
+    "node": "16.20.2",
+    "npm": "8.19.4"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2"
   }
