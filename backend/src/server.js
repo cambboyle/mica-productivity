@@ -22,7 +22,9 @@ const corsOptions = {
     "http://localhost:3000",
     "https://mica-productivity.vercel.app",
     "https://mica-productivity-git-main.vercel.app",
-    "https://mica-productivity-cambboyle.vercel.app"
+    "https://mica-productivity-cambboyle.vercel.app",
+    "https://mica-productivity.herokuapp.com",
+    "https://mica-productivity-4277d211fc20.herokuapp.com"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "x-auth-token", "Authorization"],
