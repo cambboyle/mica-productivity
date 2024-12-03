@@ -5,12 +5,12 @@ import api from "../services/api";
 import "./styles/dashboard.css";
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   description: string;
   dueDate: string;
-  priority: "high" | "medium" | "low";
-  status: "pending" | "in_progress" | "completed";
+  priority: "low" | "medium" | "high";
+  status: "todo" | "in_progress" | "done";
 }
 
 const Dashboard: React.FC = () => {
@@ -44,17 +44,17 @@ const Dashboard: React.FC = () => {
 
     return {
       overdue: tasks.filter(
-        (task) => new Date(task.dueDate) < today && task.status !== "completed"
+        (task) => new Date(task.dueDate) < today && task.status !== "done"
       ),
       today: tasks.filter(
         (task) =>
           new Date(task.dueDate).toDateString() === today.toDateString() &&
-          task.status !== "completed"
+          task.status !== "done"
       ),
       tomorrow: tasks.filter(
         (task) =>
           new Date(task.dueDate).toDateString() === tomorrow.toDateString() &&
-          task.status !== "completed"
+          task.status !== "done"
       ),
       thisWeek: tasks.filter(
         (task) => {
@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
           return (
             dueDate > tomorrow &&
             dueDate <= nextWeek &&
-            task.status !== "completed"
+            task.status !== "done"
           );
         }
       ),
@@ -72,8 +72,8 @@ const Dashboard: React.FC = () => {
   const getTaskStats = () => {
     return {
       total: tasks.length,
-      completed: tasks.filter((task) => task.status === "completed").length,
-      pending: tasks.filter((task) => task.status === "pending").length,
+      completed: tasks.filter((task) => task.status === "done").length,
+      pending: tasks.filter((task) => task.status === "todo").length,
       inProgress: tasks.filter((task) => task.status === "in_progress").length,
     };
   };

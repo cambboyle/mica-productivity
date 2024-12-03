@@ -3,12 +3,12 @@ import api from "../services/api";
 import "./styles/tasks.css";
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   description: string;
   dueDate: string;
-  priority: "high" | "medium" | "low";
-  status: "pending" | "in_progress" | "completed";
+  priority: "low" | "medium" | "high";
+  status: "todo" | "in_progress" | "done";
 }
 
 interface TaskFormData {
@@ -27,7 +27,7 @@ const Tasks: React.FC = () => {
     description: "",
     dueDate: "",
     priority: "medium",
-    status: "pending",
+    status: "todo",
   });
   const [filter, setFilter] = useState({ priority: "", status: "" });
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -68,7 +68,7 @@ const Tasks: React.FC = () => {
         description: "",
         dueDate: "",
         priority: "medium",
-        status: "pending",
+        status: "todo",
       });
       setShowForm(false);
     } catch (error) {
@@ -76,7 +76,7 @@ const Tasks: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
       await api.delete(`/tasks/${id}`);
       setTasks(tasks.filter((task) => task.id !== id));
@@ -97,7 +97,7 @@ const Tasks: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleStatusChange = async (id: number, newStatus: Task["status"]) => {
+  const handleStatusChange = async (id: string, newStatus: Task["status"]) => {
     try {
       await api.put(`/tasks/${id}`, { status: newStatus });
       setTasks(
@@ -136,9 +136,9 @@ const Tasks: React.FC = () => {
           onChange={(e) => setFilter({ ...filter, priority: e.target.value })}
         >
           <option value="">All Priorities</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
           <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
         </select>
 
         <select
@@ -147,9 +147,9 @@ const Tasks: React.FC = () => {
           onChange={(e) => setFilter({ ...filter, status: e.target.value })}
         >
           <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
+          <option value="todo">Todo</option>
           <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
+          <option value="done">Done</option>
         </select>
 
         <button
@@ -213,9 +213,28 @@ const Tasks: React.FC = () => {
                 })
               }
             >
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
               <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              className="form-control"
+              value={newTask.status}
+              onChange={(e) =>
+                setNewTask({
+                  ...newTask,
+                  status: e.target.value as Task["status"],
+                })
+              }
+            >
+              <option value="todo">Todo</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
             </select>
           </div>
 
@@ -231,7 +250,7 @@ const Tasks: React.FC = () => {
                   description: "",
                   dueDate: "",
                   priority: "medium",
-                  status: "pending",
+                  status: "todo",
                 });
               }}
             >
@@ -254,7 +273,7 @@ const Tasks: React.FC = () => {
             <div
               key={task.id}
               className={`task-item ${
-                task.status === "completed" ? "status-completed" : ""
+                task.status === "done" ? "status-done" : ""
               }`}
             >
               <div className="task-header">
@@ -294,9 +313,9 @@ const Tasks: React.FC = () => {
                   className="filter-select"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <option value="pending">Pending</option>
+                  <option value="todo">Todo</option>
                   <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
+                  <option value="done">Done</option>
                 </select>
               </div>
             </div>

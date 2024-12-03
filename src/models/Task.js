@@ -1,21 +1,22 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const User = require("./User");
 
 const Task = sequelize.define(
   "Task",
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false, // Title is required
+      allowNull: false,
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true, // Optional description
+      allowNull: true,
     },
     priority: {
       type: DataTypes.ENUM("low", "medium", "high"),
@@ -27,23 +28,23 @@ const Task = sequelize.define(
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM("pending", "in_progress", "completed"),
+      type: DataTypes.ENUM("todo", "in_progress", "done"),
       allowNull: false,
-      defaultValue: "pending",
-    },
-    tags: {
-      type: DataTypes.ARRAY(DataTypes.STRING), // Store tags as an array of strings
-      allowNull: true,
+      defaultValue: "todo",
     },
     userId: {
-      // Add userId field to associate tasks with users
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'CASCADE'
     },
   },
   {
-    tableName: "tasks",
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    tableName: "Tasks",
+    timestamps: true,
   }
 );
 

@@ -1,13 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const Task = require("../models/Task");
+const auth = require("../middleware/auth");
+
+// Apply auth middleware to all routes
+router.use(auth);
 
 // GET: Fetch tasks with optional filters
 router.get("/", async (req, res) => {
   try {
     const { priority, status } = req.query;
     let filterConditions = {
-      userId: req.user.id // Add user context from auth middleware
+      userId: req.user.id
     };
 
     if (priority) filterConditions.priority = priority;
@@ -18,82 +22,90 @@ router.get("/", async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
 
-    res.status(200).json(tasks);
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-    res.status(500).json({ error: "Failed to fetch tasks" });
+    res.json(tasks);
+  } catch (err) {
+    console.error("Error fetching tasks:", err);
+    res.status(500).json({ error: "Server error while fetching tasks" });
   }
 });
 
 // POST: Create a new task
 router.post("/", async (req, res) => {
   try {
-    const { title, description, priority, dueDate, status, tags } = req.body;
+    const { title, description, priority, dueDate, status } = req.body;
 
-    // Basic validation: Ensure that required fields are provided
-    if (!title || !priority) {
-      return res.status(400).json({ error: "Title and priority are required" });
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
     }
 
-    // Create the task with user context
     const newTask = await Task.create({
+      title,
+      description,
+      priority: priority || "medium",
+      dueDate,
+      status: status || "todo",
+      userId: req.user.id
+    });
+
+    res.status(201).json(newTask);
+  } catch (err) {
+    console.error("Error creating task:", err);
+    res.status(500).json({ error: "Server error while creating task" });
+  }
+});
+
+// PUT: Update a task
+router.put("/:id", async (req, res) => {
+  try {
+    const { title, description, priority, dueDate, status } = req.body;
+    const taskId = req.params.id;
+
+    const task = await Task.findOne({
+      where: {
+        id: taskId,
+        userId: req.user.id
+      }
+    });
+
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    await task.update({
       title,
       description,
       priority,
       dueDate,
-      status,
-      tags,
-      userId: req.user.id // Add user context from auth middleware
+      status
     });
 
-    res.status(201).json(newTask);
-  } catch (error) {
-    console.error("Error creating task:", error);
-    res.status(500).json({ error: "Failed to create task" });
-  }
-});
-
-// PUT: Update task status
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status, title, description, priority, dueDate } = req.body;
-
-    const task = await Task.findOne({ where: { id, userId: req.user.id } });
-    if (!task) {
-      return res.status(404).json({ error: "Task not found or unauthorized" });
-    }
-
-    // Update task properties
-    task.status = status || task.status;
-    task.title = title || task.title;
-    task.description = description || task.description;
-    task.priority = priority || task.priority;
-    task.dueDate = dueDate || task.dueDate;
-
-    await task.save();
-    res.status(200).json(task);
-  } catch (error) {
-    console.error("Error updating task:", error);
-    res.status(500).json({ error: "Failed to update task" });
+    res.json(task);
+  } catch (err) {
+    console.error("Error updating task:", err);
+    res.status(500).json({ error: "Server error while updating task" });
   }
 });
 
 // DELETE: Delete a task
 router.delete("/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const taskId = req.params.id;
+    const task = await Task.findOne({
+      where: {
+        id: taskId,
+        userId: req.user.id
+      }
+    });
 
-    const task = await Task.findOne({ where: { id, userId: req.user.id } });
     if (!task) {
-      return res.status(404).json({ error: "Task not found or unauthorized" });
+      return res.status(404).json({ error: "Task not found" });
     }
 
     await task.destroy();
-    res.status(204).send();
-  } catch (error) {
-    console.error("Error deleting task:", error);
-    res.status(500).json({ error: "Failed to delete task" });
+    res.json({ message: "Task deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting task:", err);
+    res.status(500).json({ error: "Server error while deleting task" });
   }
 });
 

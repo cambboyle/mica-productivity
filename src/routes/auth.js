@@ -2,154 +2,157 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
-const { Pool } = require("pg");
+const User = require("../models/User");
 require("dotenv").config();
 
 const router = express.Router();
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: 5432,
-});
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const authMiddleware = (req, res, next) => {
-  const token = req.header("x-auth-token");
-  if (!token) {
-    return res.status(401).json({ msg: "No token, authorization denied" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // Attach user data to the request object
-    next();
-  } catch (err) {
-    res.status(401).json({ msg: "Token is not valid" });
-  }
-};
-
 // Register User
-router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const client = await pool.connect();
-
-    // Check if the user already exists
-    const userExists = await client.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
-
-    if (userExists.rows.length > 0) {
-      client.release();
-      return res.status(400).json({ msg: "User already exists" });
+router.post(
+  "/register",
+  [
+    body("email").isEmail().withMessage("Please enter a valid email"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters long"),
+  ],
+  async (req, res) => {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { email, password } = req.body;
 
-    // Insert the new user
-    const result = await client.query(
-      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email",
-      [email, hashedPassword]
-    );
+    try {
+      // Check if user exists
+      let user = await User.findOne({ where: { email } });
+      if (user) {
+        return res.status(400).json({ error: "User already exists" });
+      }
 
-    const user = result.rows[0];
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+      // Create new user
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
-    client.release();
-    res.json({ token });
-  } catch (err) {
-    console.error("Registration Error:", err.message);
-    res.status(500).send("Server error");
+      user = await User.create({
+        email,
+        password: hashedPassword,
+      });
+
+      // Create and return JWT token
+      const payload = {
+        id: user.id,
+        email: user.email,
+      };
+
+      jwt.sign(
+        payload,
+        JWT_SECRET,
+        { expiresIn: "24h" },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token, user: { id: user.id, email: user.email } });
+        }
+      );
+    } catch (err) {
+      console.error("Error in register:", err);
+      res.status(500).json({ error: "Server error during registration" });
+    }
   }
-});
+);
 
 // Login User
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Enter a valid email"),
+    body("email").isEmail().withMessage("Please enter a valid email"),
     body("password").exists().withMessage("Password is required"),
   ],
   async (req, res) => {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
     const { email, password } = req.body;
 
     try {
-      const client = await pool.connect();
-
-      // Check if the user exists
-      const userResult = await client.query(
-        "SELECT * FROM users WHERE email = $1",
-        [email]
-      );
-      const user = userResult.rows[0];
-
+      // Check if user exists
+      const user = await User.findOne({ where: { email } });
       if (!user) {
-        client.release();
-        return res.status(400).json({ msg: "Invalid credentials" });
+        return res.status(400).json({ error: "Invalid credentials" });
       }
 
-      // Compare passwords
+      // Validate password
       const isMatch = await bcrypt.compare(password, user.password);
-
       if (!isMatch) {
-        client.release();
-        return res.status(400).json({ msg: "Invalid credentials" });
+        return res.status(400).json({ error: "Invalid credentials" });
       }
 
-      // Generate token
-      const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+      // Create and return JWT token
+      const payload = {
+        id: user.id,
+        email: user.email,
+      };
 
-      client.release();
-      res.json({ 
-        token,
-        user: {
-          id: user.id,
-          email: user.email
+      jwt.sign(
+        payload,
+        JWT_SECRET,
+        { expiresIn: "24h" },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token, user: { id: user.id, email: user.email } });
         }
-      });
+      );
     } catch (err) {
-      console.error("Login Error:", err.message);
-      res.status(500).send("Server error");
+      console.error("Error in login:", err);
+      res.status(500).json({ error: "Server error during login" });
     }
   }
 );
 
 // Verify Token
-router.get("/verify", authMiddleware, (req, res) => {
-  res.json(req.user); // Send back the user data if the token is valid
-});
-
-// New endpoint to get user data
-router.get("/user", authMiddleware, async (req, res) => {
+router.get("/verify", async (req, res) => {
   try {
-    const client = await pool.connect();
-    const userId = req.user.id; // Get user ID from the token
-
-    // Fetch user data
-    const userResult = await client.query(
-      "SELECT email FROM users WHERE id = $1",
-      [userId]
-    );
-
-    if (userResult.rows.length === 0) {
-      return res.status(404).json({ msg: "User not found" });
+    const user = await User.findByPk(req.user.id, {
+      attributes: ['id', 'email']
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
-
-    const userEmail = userResult.rows[0].email; // Get the user's email
-    res.json({ email: userEmail }); // Return the user's email
+    res.json({ user });
   } catch (err) {
-    console.error("Error fetching user data:", err.message);
-    res.status(500).send("Server error");
+    console.error("Verification Error:", err);
+    res.status(500).json({ error: "Server error during verification" });
   }
 });
 
-module.exports = {
-  router,
-  authMiddleware
-};
+// Get current user
+router.get("/user", async (req, res) => {
+  try {
+    const token = req.header("x-auth-token");
+    if (!token) {
+      return res.status(401).json({ error: "No token, authorization denied" });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findByPk(decoded.id, {
+      attributes: { exclude: ["password"] },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ error: "Server error while fetching user" });
+  }
+});
+
+module.exports = router;

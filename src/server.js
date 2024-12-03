@@ -1,16 +1,16 @@
 const express = require("express");
-const sequelize = require("./config/database");
 const cors = require("cors");
+const sequelize = require("./config/database");
+const auth = require("./middleware/auth");
+
+// Import routes
+const authRoutes = require("./routes/auth");
 const taskRoutes = require("./routes/tasks");
-const { router: auth, authMiddleware } = require('./routes/auth');
-require("dotenv").config();
+const preferenceRoutes = require("./routes/preferences");
 
 const app = express();
 
-// Middleware for parsing JSON requests
-app.use(express.json());
-
-// Middleware for CORS
+// CORS configuration
 const corsOptions = {
   origin: "http://localhost:3000", // Frontend URL
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -19,37 +19,37 @@ const corsOptions = {
   credentials: true
 };
 
+// Middleware
 app.use(cors(corsOptions));
+app.use(express.json());
 
-// Log incoming requests
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`, req.body);
-  next();
-});
+// Routes with /api prefix
+app.use("/api/auth", authRoutes);
+app.use("/api/tasks", auth, taskRoutes);
+app.use("/api/preferences", auth, preferenceRoutes);
 
-// Routes
-// Public routes
-app.use("/api/auth", auth);
+const PORT = process.env.PORT || 5000;
 
-// Protected routes
-app.use("/api/tasks", authMiddleware, taskRoutes);
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something broke!");
-});
-
-(async () => {
+// Database connection and sync
+const initializeDatabase = async () => {
   try {
+    // Test database connection
     await sequelize.authenticate();
     console.log("Database connected successfully!");
-    await sequelize.sync({ alter: true });
-    console.log("Models synchronized!");
-    app.listen(5000, () => {
-      console.log("Server is running on http://localhost:5000");
+
+    // Drop and recreate all tables
+    await sequelize.sync({ force: true });
+    console.log("All models synchronized successfully!");
+
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("Unable to connect to the database:", error);
+    process.exit(1);
   }
-})();
+};
+
+// Initialize the application
+initializeDatabase();
