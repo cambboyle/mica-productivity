@@ -1,0 +1,116 @@
+:root {
+  --background-color: #f8f9fa;
+  --surface-color: #ffffff;
+  --primary-color: #0066cc;
+  --primary-color-dark: #0052a3;
+  --primary-color-rgb: 0, 102, 204;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --border-color: #e2e8f0;
+  --input-background: #ffffff;
+  --disabled-background: #f1f5f9;
+  --accent-color: #6366f1;
+  --accent-hover: #4f46e5;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-color);
+}
+
+.main-container {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Welcome page styles */
+.welcome-container {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.welcome-title-primary{
+  text-decoration: none;
+  font-family: Pacifico, cursive;
+  font-size: 3rem;
+  font-weight: 400;
+  color: black;
+}
+
+.welcome-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.welcome-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.welcome-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.welcome-button-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.welcome-button-primary:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.welcome-button-secondary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.welcome-button-secondary:hover {
+  background-color: var(--background-color);
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}

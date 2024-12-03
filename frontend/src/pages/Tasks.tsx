@@ -1,13 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../services/api";
-import TaskForm from "../components/TaskForm";
-import TaskFilters from "../components/TaskFilters";
-import TaskList from "../components/TaskList";
+import "./styles/tasks.css";
 
-const Tasks = () => {
-  const [tasks, setTasks] = useState<any[]>([]);
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  priority: "high" | "medium" | "low";
+  status: "pending" | "in_progress" | "completed";
+}
+
+interface TaskFormData {
+  title: string;
+  description: string;
+  dueDate: string;
+  priority: Task["priority"];
+  status: Task["status"];
+}
+
+const Tasks: React.FC = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newTask, setNewTask] = useState({
+  const [newTask, setNewTask] = useState<TaskFormData>({
     title: "",
     description: "",
     dueDate: "",
@@ -15,30 +30,25 @@ const Tasks = () => {
     status: "pending",
   });
   const [filter, setFilter] = useState({ priority: "", status: "" });
-  const [editingTask, setEditingTask] = useState<any | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await api.get("/tasks");
-        setTasks(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-        setLoading(false);
-      }
-    };
     fetchTasks();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<any>) => {
-    setNewTask({
-      ...newTask,
-      [e.target.name]: e.target.value,
-    });
+  const fetchTasks = async () => {
+    try {
+      const response = await api.get("/tasks");
+      setTasks(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingTask) {
@@ -60,25 +70,22 @@ const Tasks = () => {
         priority: "medium",
         status: "pending",
       });
+      setShowForm(false);
     } catch (error) {
       console.error("Error saving task:", error);
     }
   };
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilter({
-      ...filter,
-      [e.target.name]: e.target.value,
-    });
+  const handleDelete = async (id: number) => {
+    try {
+      await api.delete(`/tasks/${id}`);
+      setTasks(tasks.filter((task) => task.id !== id));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
-  const filteredTasks = tasks.filter(
-    (task) =>
-      (filter.priority ? task.priority === filter.priority : true) &&
-      (filter.status ? task.status === filter.status : true)
-  );
-
-  const handleEdit = (task: any) => {
+  const handleEdit = (task: Task) => {
     setEditingTask(task);
     setNewTask({
       title: task.title,
@@ -87,46 +94,215 @@ const Tasks = () => {
       priority: task.priority,
       status: task.status,
     });
+    setShowForm(true);
   };
 
-  const handleCancelEdit = () => {
-    setEditingTask(null);
-    setNewTask({
-      title: "",
-      description: "",
-      dueDate: "",
-      priority: "medium",
-      status: "pending",
-    });
-  };
-
-  const handleDeleteTask = async () => {
-    if (editingTask) {
-      try {
-        await api.delete(`/tasks/${editingTask.id}`);
-        setTasks(tasks.filter((task) => task.id !== editingTask.id));
-        handleCancelEdit();
-      } catch (error) {
-        console.error("Error deleting task:", error);
-      }
+  const handleStatusChange = async (id: number, newStatus: Task["status"]) => {
+    try {
+      await api.put(`/tasks/${id}`, { status: newStatus });
+      setTasks(
+        tasks.map((task) =>
+          task.id === id ? { ...task, status: newStatus } : task
+        )
+      );
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      // Revert the status change in UI if the API call fails
+      alert("Failed to update task status. Please try again.");
     }
   };
 
-  if (loading) return <p>Loading tasks...</p>;
+  const filteredTasks = tasks.filter((task) => {
+    if (filter.priority && task.priority !== filter.priority) return false;
+    if (filter.status && task.status !== filter.status) return false;
+    return true;
+  });
+
+  if (loading) {
+    return <div className="loading-state">Loading tasks...</div>;
+  }
 
   return (
-    <div className="">
-      <h1 className="">Tasks</h1>
-      <TaskForm
-        newTask={newTask}
-        setNewTask={setNewTask}
-        handleSubmit={handleSubmit}
-        editingTask={editingTask}
-        handleCancelEdit={handleCancelEdit}
-        handleDeleteTask={handleDeleteTask}
-      />
-      <TaskFilters filter={filter} handleFilterChange={handleFilterChange} />
-      <TaskList filteredTasks={filteredTasks} handleEdit={handleEdit} />
+    <div className="tasks-container">
+      <div className="tasks-header">
+        <h1 className="tasks-title">Tasks</h1>
+        <p className="tasks-subtitle">Manage your tasks and stay organized</p>
+      </div>
+
+      <div className="task-filters">
+        <select
+          className="filter-select"
+          value={filter.priority}
+          onChange={(e) => setFilter({ ...filter, priority: e.target.value })}
+        >
+          <option value="">All Priorities</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        <select
+          className="filter-select"
+          value={filter.status}
+          onChange={(e) => setFilter({ ...filter, status: e.target.value })}
+        >
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowForm(!showForm)}
+        >
+          {showForm ? "Cancel" : "New Task"}
+        </button>
+      </div>
+
+      {showForm && (
+        <form onSubmit={handleSubmit} className="new-task-form">
+          <div className="form-group">
+            <label htmlFor="title">Title</label>
+            <input
+              type="text"
+              id="title"
+              className="form-control"
+              value={newTask.title}
+              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+              required
+              placeholder="Enter task title"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              className="form-control"
+              value={newTask.description}
+              onChange={(e) =>
+                setNewTask({ ...newTask, description: e.target.value })
+              }
+              placeholder="Enter task description"
+              rows={3}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="dueDate">Due Date</label>
+            <input
+              type="date"
+              id="dueDate"
+              className="form-control"
+              value={newTask.dueDate}
+              onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="priority">Priority</label>
+            <select
+              id="priority"
+              className="form-control"
+              value={newTask.priority}
+              onChange={(e) =>
+                setNewTask({
+                  ...newTask,
+                  priority: e.target.value as Task["priority"],
+                })
+              }
+            >
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+
+          <div className="form-buttons">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setShowForm(false);
+                setEditingTask(null);
+                setNewTask({
+                  title: "",
+                  description: "",
+                  dueDate: "",
+                  priority: "medium",
+                  status: "pending",
+                });
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              {editingTask ? "Update Task" : "Create Task"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="tasks-list">
+        {filteredTasks.length === 0 ? (
+          <div className="empty-state">
+            <p>No tasks found. Create a new task to get started!</p>
+          </div>
+        ) : (
+          filteredTasks.map((task) => (
+            <div
+              key={task.id}
+              className={`task-item ${
+                task.status === "completed" ? "status-completed" : ""
+              }`}
+            >
+              <div className="task-header">
+                <h3 className="task-title">{task.title}</h3>
+                <div className="task-actions">
+                  <button
+                    className="task-action-button"
+                    onClick={() => handleEdit(task)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="task-action-button"
+                    onClick={() => handleDelete(task.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              {task.description && (
+                <p className="task-description">{task.description}</p>
+              )}
+
+              <div className="task-meta">
+                {task.dueDate && (
+                  <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                )}
+                <span className={`task-badge priority-${task.priority}`}>
+                  {task.priority}
+                </span>
+                <select
+                  value={task.status}
+                  onChange={(e) =>
+                    handleStatusChange(task.id, e.target.value as Task["status"])
+                  }
+                  className="filter-select"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

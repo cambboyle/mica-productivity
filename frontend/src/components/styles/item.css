@@ -1,37 +1,56 @@
-.card {
-    position: relative;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    margin: 5px;
-    transition: transform 0.2s;
-    font-size: 0.9em;
-  }
-  
-  .priority-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
-  }
-  
-  .priority-label {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    background-color: #f0f0f0;
-  }
-  
-  .due-date-label {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    background-color: #f0f0f0;
-    margin-left: 10px;
-  }
-  
-  .card:hover {
-    transform: scale(1.03);
-  }
+.task-item {
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.task-item:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.task-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.task-item-priority {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-transform: capitalize;
+}
+
+.task-item-date {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.task-item-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.task-item-description {
+  color: var(--muted-foreground);
+  margin-bottom: 1rem;
+}
+
+
+.bg-red-100 { background-color: #fee2e2; }
+.text-red-800 { color: #991b1b; }
+.bg-yellow-100 { background-color: #fef3c7; }
+.text-yellow-800 { color: #92400e; }
+.bg-green-100 { background-color: #d1fae5; }
+.text-green-800 { color: #065f46; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.text-gray-800 { color: #1f2937; }
+

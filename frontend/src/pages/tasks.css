@@ -1,0 +1,44 @@
+.tasks-container {
+  padding: 2rem 0;
+}
+
+.tasks-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--foreground);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.tasks-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.tasks-loading {
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 1.125rem;
+}
+
+.tasks-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+@media (min-width: 768px) {
+  .tasks-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .tasks-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+

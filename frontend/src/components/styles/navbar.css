@@ -1,44 +1,96 @@
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 
-
 .navbar {
-    background-color: #f8f9fa;
-    padding: 10px 20px;
-  }
-  
-  .navbar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .navbar-links {
-    list-style: none;
-    display: flex;
-    padding: 0;
-  }
-  
-  .navbar-link {
-    margin-left: 20px;
-    text-decoration: none;
-    color: #007bff;
-  }
+  background-color: var(--background-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-  .navbar-title {
-    display: flex;
-    align-items: flex-end;
-    font-family: Pacifico, serif;
-  }
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
 
-  .navbar-title-bold {
-    font-weight: bold;
-    font-size: 2em;
-    line-height: 1;
-  }
+.navbar-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin: 0;
+  font-family: Pacifico, cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
 
-  .navbar-title-small {
-    font-size: 0.8em;
-    margin-left: 5px;
-    line-height: 1;
-  }
-  
+.navbar-title-primary {
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+.navbar-title-muted {
+  color: var(--accent-color);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-link {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navbar-link:hover {
+  color: var(--accent-color);
+}
+
+.customize-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+}
+
+.customize-btn:hover {
+  background-color: var(--hover-color);
+  color: var(--accent-color);
+}
+
+.logout-btn {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  color: var(--text-color);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: var(--hover-color);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}

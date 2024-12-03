@@ -1,29 +1,53 @@
-.filter-container {
+.task-filters {
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    display: inline-block;
+  }
+  
+  .task-filters-grid {
     display: flex;
-    align-items: center;
-    background-color: transparent;
-    padding: 10px;
-    margin: 10px auto;
-    max-width: 600px;
-}
-
-.filter-title {
-    font-size: 20px;
-    margin-right: 20px;
-    text-align: center;
-}
-
-.filter-label {
-    margin: 0 5px;
-    font-weight: 500;
-}
-
-.filter-select {
-    padding: 10px;
-    margin: 0 15px;
-    border: 1px solid #ccc;
+    gap: 1rem;
+  }
+  
+  .task-filters-select-wrapper {
+    position: relative;
+  }
+  
+  .task-filters-select-wrapper::after {
+    content: '▼';
+    font-size: 0.8em;
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--muted-foreground);
+  }
+  
+  .task-filters-select {
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    border: 1px solid var(--input);
     border-radius: 4px;
-    background-color: #ffffff;
-    color: #333;
-    font-size: 14px;
-}
+    font-size: 0.875rem;
+    background-color: var(--background);
+    color: var(--foreground);
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .task-filters-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: var(--outline);
+  }
+  
+  .task-filters-select:hover {
+    border-color: var(--primary);
+  }
+  
+  
