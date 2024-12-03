@@ -8,8 +8,8 @@
     "dev": "nodemon src/server.js"
   },
   "engines": {
-    "node": "18.x",
-    "npm": "9.x"
+    "node": "18.18.0",
+    "npm": "9.8.1"
   },
   "keywords": [],
   "author": "",
