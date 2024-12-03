@@ -18,14 +18,22 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "https://mica-productivity.vercel.app",
-    "https://mica-productivity-git-main.vercel.app",
-    "https://mica-productivity-cambboyle.vercel.app",
-    "https://mica-productivity.herokuapp.com",
-    "https://mica-productivity-4277d211fc20.herokuapp.com"
-  ],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://mica-productivity.vercel.app",
+      "https://mica-productivity-git-main.vercel.app",
+      "https://mica-productivity-cambboyle.vercel.app",
+      "https://mica-productivity.herokuapp.com",
+      "https://mica-productivity-4277d211fc20.herokuapp.com"
+    ];
+    // Check if origin is in allowedOrigins or if it's undefined (like postman)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "x-auth-token", "Authorization"],
   exposedHeaders: ["x-auth-token"],
