@@ -16,33 +16,31 @@ const preferenceRoutes = require("./routes/preferences");
 
 const app = express();
 
-// CORS configuration
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "https://mica-productivity.vercel.app",
-      "https://mica-productivity-git-main.vercel.app",
-      "https://mica-productivity-cambboyle.vercel.app",
-      "https://mica-productivity.herokuapp.com",
-      "https://mica-productivity-4277d211fc20.herokuapp.com"
-    ];
-    // Check if origin is in allowedOrigins or if it's undefined (like postman)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "x-auth-token", "Authorization"],
-  exposedHeaders: ["x-auth-token"],
-  credentials: true
-};
+// Enable CORS for all requests
+app.use(cors());
+
+// Add headers to all responses
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://mica-productivity.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
+  res.header('Access-Control-Allow-Credentials', true);
+  
+  // Handle OPTIONS method
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Middleware
-app.use(cors(corsOptions));
 app.use(express.json());
+
+// Debug middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Origin: ${req.get('origin')}`);
+  next();
+});
 
 // Health check route
 app.get("/", (req, res) => {
