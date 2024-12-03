@@ -18,8 +18,10 @@ router.get("/", async (req, res) => {
     if (status) filterConditions.status = status;
 
     const tasks = await Task.findAll({
+      attributes: ['id', 'userId', 'title', 'description', 'priority', 'dueDate', 'status', 'createdAt', 'updatedAt'],
       where: filterConditions,
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      raw: true
     });
 
     res.json(tasks);
@@ -38,16 +40,21 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Title is required" });
     }
 
-    const newTask = await Task.create({
-      title,
-      description,
-      priority: priority || "medium",
-      dueDate,
-      status: status || "todo",
-      userId: req.user.id
-    });
+    const newTask = await Task.create(
+      {
+        title,
+        description,
+        priority: priority || "medium",
+        dueDate,
+        status: status || "todo",
+        userId: req.user.id
+      },
+      {
+        returning: ['id', 'userId', 'title', 'description', 'priority', 'dueDate', 'status', 'createdAt', 'updatedAt']
+      }
+    );
 
-    res.status(201).json(newTask);
+    res.status(201).json(newTask.get({ plain: true }));
   } catch (err) {
     console.error("Error creating task:", err);
     res.status(500).json({ error: "Server error while creating task" });
@@ -61,25 +68,39 @@ router.put("/:id", async (req, res) => {
     const taskId = req.params.id;
 
     const task = await Task.findOne({
+      attributes: ['id', 'userId', 'title', 'description', 'priority', 'dueDate', 'status', 'createdAt', 'updatedAt'],
       where: {
         id: taskId,
         userId: req.user.id
-      }
+      },
+      raw: true
     });
 
     if (!task) {
       return res.status(404).json({ error: "Task not found" });
     }
 
-    await task.update({
-      title,
-      description,
-      priority,
-      dueDate,
-      status
+    await Task.update(
+      {
+        title,
+        description,
+        priority,
+        dueDate,
+        status
+      },
+      {
+        where: { id: taskId, userId: req.user.id },
+        returning: ['id', 'userId', 'title', 'description', 'priority', 'dueDate', 'status', 'createdAt', 'updatedAt']
+      }
+    );
+
+    const updatedTask = await Task.findOne({
+      attributes: ['id', 'userId', 'title', 'description', 'priority', 'dueDate', 'status', 'createdAt', 'updatedAt'],
+      where: { id: taskId, userId: req.user.id },
+      raw: true
     });
 
-    res.json(task);
+    res.json(updatedTask);
   } catch (err) {
     console.error("Error updating task:", err);
     res.status(500).json({ error: "Server error while updating task" });
@@ -90,19 +111,18 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const taskId = req.params.id;
-    const task = await Task.findOne({
+    const result = await Task.destroy({
       where: {
         id: taskId,
         userId: req.user.id
       }
     });
 
-    if (!task) {
+    if (!result) {
       return res.status(404).json({ error: "Task not found" });
     }
 
-    await task.destroy();
-    res.json({ message: "Task deleted successfully" });
+    res.status(204).send();
   } catch (err) {
     console.error("Error deleting task:", err);
     res.status(500).json({ error: "Server error while deleting task" });

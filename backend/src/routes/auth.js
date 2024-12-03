@@ -45,7 +45,10 @@ router.post(
 
     try {
       // Check if user exists
-      let user = await User.findOne({ where: { email } });
+      let user = await User.findOne({
+        where: { email },
+        attributes: ['id', 'email', 'password_hash', 'createdAt', 'updatedAt']
+      });
       if (user) {
         return res.status(400).json({ error: "User already exists" });
       }
@@ -56,7 +59,7 @@ router.post(
 
       user = await User.create({
         email,
-        password: hashedPassword,
+        password_hash: hashedPassword,
       });
 
       // Create and return JWT token
@@ -99,13 +102,16 @@ router.post(
 
     try {
       // Check if user exists
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({
+        where: { email },
+        attributes: ['id', 'email', 'password_hash', 'createdAt', 'updatedAt'],
+      });
       if (!user) {
         return res.status(400).json({ error: "Invalid credentials" });
       }
 
       // Validate password
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(password, user.password_hash);
       if (!isMatch) {
         return res.status(400).json({ error: "Invalid credentials" });
       }
@@ -152,7 +158,7 @@ router.get("/verify", auth, async (req, res) => {
 router.get("/user", auth, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: { exclude: ["password"] },
+      attributes: { exclude: ["password_hash"] },
     });
 
     if (!user) {

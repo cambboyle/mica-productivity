@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { sequelize } = require('../config/database');
 
 const User = sequelize.define('User', {
   id: {
@@ -15,12 +15,20 @@ const User = sequelize.define('User', {
       isEmail: true,
     },
   },
-  password: {
+  password_hash: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 }, {
+  tableName: 'Users',
   timestamps: true,
 });
+
+User.associate = (models) => {
+  User.hasMany(models.Task, {
+    foreignKey: 'userId',
+    as: 'tasks'
+  });
+};
 
 module.exports = User;

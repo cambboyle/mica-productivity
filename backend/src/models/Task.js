@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { sequelize } = require("../config/database");
 const User = require("./User");
 
 const Task = sequelize.define(
@@ -9,6 +9,15 @@ const Task = sequelize.define(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      field: 'userId',
+      references: {
+        model: 'Users',
+        key: 'id'
+      }
     },
     title: {
       type: DataTypes.STRING,
@@ -31,21 +40,22 @@ const Task = sequelize.define(
       type: DataTypes.ENUM("todo", "in_progress", "done"),
       allowNull: false,
       defaultValue: "todo",
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onDelete: 'CASCADE'
-    },
+    }
   },
   {
     tableName: "Tasks",
-    timestamps: true,
+    underscored: false
   }
 );
+
+// Define the association
+Task.belongsTo(User, {
+  foreignKey: {
+    name: 'userId',
+    field: 'userId'
+  },
+  as: 'user',
+  constraints: true
+});
 
 module.exports = Task;

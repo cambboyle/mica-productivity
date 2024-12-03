@@ -7,16 +7,23 @@ const auth = require('../middleware/auth');
 router.get('/', auth, async (req, res) => {
   try {
     const preferences = await UserPreferences.findOne({
-      where: { userId: req.user.id }
+      attributes: ['id', 'userId', 'accentColor', 'createdAt', 'updatedAt'],
+      where: { userId: req.user.id },
+      raw: true
     });
 
     if (!preferences) {
       // Create default preferences for the user
-      const defaultPreferences = await UserPreferences.create({
-        userId: req.user.id,
-        accentColor: '#6366f1' // Default indigo color
-      });
-      return res.json(defaultPreferences);
+      const defaultPreferences = await UserPreferences.create(
+        {
+          userId: req.user.id,
+          accentColor: '#6366f1' // Default indigo color
+        },
+        {
+          returning: ['id', 'userId', 'accentColor', 'createdAt', 'updatedAt']
+        }
+      );
+      return res.json(defaultPreferences.get({ plain: true }));
     }
 
     res.json(preferences);
@@ -40,18 +47,39 @@ router.put('/', auth, async (req, res) => {
       return res.status(400).json({ error: 'Invalid color format. Must be a valid hex color (e.g., #FF0000)' });
     }
 
-    const [preferences, created] = await UserPreferences.findOrCreate({
+    let preferences = await UserPreferences.findOne({
+      attributes: ['id', 'userId', 'accentColor', 'createdAt', 'updatedAt'],
       where: { userId: req.user.id },
-      defaults: {
-        userId: req.user.id,
-        accentColor,
-      }
+      raw: true
     });
 
-    if (!created) {
-      // Update existing preferences
-      await preferences.update({ accentColor });
+    if (!preferences) {
+      preferences = await UserPreferences.create(
+        {
+          userId: req.user.id,
+          accentColor
+        },
+        {
+          returning: ['id', 'userId', 'accentColor', 'createdAt', 'updatedAt']
+        }
+      );
+      return res.json(preferences.get({ plain: true }));
     }
+
+    await UserPreferences.update(
+      { accentColor },
+      {
+        where: { userId: req.user.id },
+        returning: ['id', 'userId', 'accentColor', 'createdAt', 'updatedAt']
+      }
+    );
+
+    // Fetch the updated preferences
+    preferences = await UserPreferences.findOne({
+      attributes: ['id', 'userId', 'accentColor', 'createdAt', 'updatedAt'],
+      where: { userId: req.user.id },
+      raw: true
+    });
 
     res.json(preferences);
   } catch (err) {

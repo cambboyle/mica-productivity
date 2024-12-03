@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { sequelize } = require("../config/database");
 const User = require("./User");
 
 const UserPreferences = sequelize.define(
@@ -14,6 +14,7 @@ const UserPreferences = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
       unique: true,
+      field: 'userId',
       references: {
         model: 'Users',
         key: 'id'
@@ -25,23 +26,21 @@ const UserPreferences = sequelize.define(
       allowNull: false,
       defaultValue: "#6366f1", // Default indigo color
     },
-    // Add more preference fields here as needed
   },
   {
     tableName: "user_preferences",
-    timestamps: true,
+    underscored: false,
   }
 );
 
-// Set up associations
+// Define the association
 UserPreferences.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'user'
-});
-
-User.hasOne(UserPreferences, {
-  foreignKey: 'userId',
-  as: 'preferences'
+  foreignKey: {
+    name: 'userId',
+    field: 'userId'
+  },
+  as: 'user',
+  constraints: true
 });
 
 module.exports = UserPreferences;
