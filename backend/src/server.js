@@ -4,6 +4,11 @@ const sequelize = require("./config/database");
 const auth = require("./middleware/auth");
 require("dotenv").config();
 
+// Import models
+const User = require("./models/User");
+const Task = require("./models/Task");
+const UserPreferences = require("./models/UserPreferences");
+
 // Import routes
 const authRoutes = require("./routes/auth");
 const taskRoutes = require("./routes/tasks");
@@ -44,20 +49,45 @@ const PORT = process.env.PORT || 5000;
 // Database connection and sync
 async function initializeDatabase() {
   try {
+    console.log("Attempting to connect to the database...");
     await sequelize.authenticate();
-    console.log("Database connection has been established successfully.");
+    console.log("Database connection established successfully.");
+
+    // Define model associations
+    User.hasMany(Task);
+    Task.belongsTo(User);
+    User.hasOne(UserPreferences);
+    UserPreferences.belongsTo(User);
+
+    console.log("Syncing database...");
     await sequelize.sync();
     console.log("Database synchronized successfully.");
     
-    // Only start listening after database is ready
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
+      console.log("Environment:", process.env.NODE_ENV);
     });
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error("Unable to connect to the database:");
+    console.error(error.message);
+    console.error(error.stack);
     process.exit(1);
   }
 }
 
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Rejection:', error);
+  process.exit(1);
+});
+
 // Initialize the application
-initializeDatabase();
+initializeDatabase().catch(error => {
+  console.error("Failed to initialize database:", error);
+  process.exit(1);
+});
