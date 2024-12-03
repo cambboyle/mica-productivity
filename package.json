@@ -1,25 +1,14 @@
 {
-  "name": "mica-productivity",
+  "name": "mica-productivity-root",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/server.js",
+  "description": "Root package for Mica Productivity",
   "scripts": {
-    "server": "nodemon src/server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "express-validator": "^7.2.0",
-    "jsonwebtoken": "^9.0.2",
-    "pg": "^8.13.1",
-    "sequelize": "^6.37.5"
+    "start": "cd backend && npm start",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "concurrently": "^8.2.2"
   }
 }

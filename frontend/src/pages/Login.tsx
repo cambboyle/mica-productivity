@@ -33,7 +33,7 @@ const Login = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate("/dashboard");
+      navigate("/home");
     } catch (err: any) {
       console.error("Login error:", err);
       setError(err.message || "An error occurred during login");

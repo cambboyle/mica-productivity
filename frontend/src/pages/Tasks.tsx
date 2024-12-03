@@ -153,7 +153,7 @@ const Tasks: React.FC = () => {
         </select>
 
         <button
-          className="btn btn-primary"
+          className="button button-primary"
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? "Cancel" : "New Task"}
@@ -238,10 +238,13 @@ const Tasks: React.FC = () => {
             </select>
           </div>
 
-          <div className="form-buttons">
+          <div className="form-actions">
+            <button type="submit" className="button button-primary">
+              {editingTask ? "Update Task" : "Create Task"}
+            </button>
             <button
               type="button"
-              className="btn btn-secondary"
+              className="button button-secondary"
               onClick={() => {
                 setShowForm(false);
                 setEditingTask(null);
@@ -256,9 +259,6 @@ const Tasks: React.FC = () => {
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
-              {editingTask ? "Update Task" : "Create Task"}
-            </button>
           </div>
         </form>
       )}
@@ -266,27 +266,28 @@ const Tasks: React.FC = () => {
       <div className="tasks-list">
         {filteredTasks.length === 0 ? (
           <div className="empty-state">
-            <p>No tasks found. Create a new task to get started!</p>
+            <p>No tasks found.</p>
+            <button
+              className="button button-primary"
+              onClick={() => setShowForm(true)}
+            >
+              Create your first task
+            </button>
           </div>
         ) : (
           filteredTasks.map((task) => (
-            <div
-              key={task.id}
-              className={`task-item ${
-                task.status === "done" ? "status-done" : ""
-              }`}
-            >
+            <div key={task.id} className="task-item">
               <div className="task-header">
                 <h3 className="task-title">{task.title}</h3>
                 <div className="task-actions">
                   <button
-                    className="task-action-button"
+                    className="task-action-button edit-button"
                     onClick={() => handleEdit(task)}
                   >
                     Edit
                   </button>
                   <button
-                    className="task-action-button"
+                    className="task-action-button delete-button"
                     onClick={() => handleDelete(task.id)}
                   >
                     Delete

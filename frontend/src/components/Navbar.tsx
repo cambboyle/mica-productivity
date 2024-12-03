@@ -16,21 +16,41 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="navbar">
-      <div className="container navbar-container">
-        <h1 className="navbar-title">
-          <Link to="/" className="navbar-title-primary">
-            mica.<span className="navbar-title-muted">productivity</span>
-          </Link>
-        </h1>
-        <ul className="navbar-links">
-          {isAuthenticated ? (
-            <>
+      <div className="navbar-container">
+        <div className="navbar-section">
+          <h1 className="navbar-title">
+            <Link to={isAuthenticated ? "/home" : "/"} className="navbar-title-primary">
+              mica.<span className="navbar-title-muted">productivity</span>
+            </Link>
+          </h1>
+        </div>
+
+        <div className="navbar-section navbar-section-center">
+          {isAuthenticated && (
+            <ul className="navbar-links">
               <li>
                 <Link to="/dashboard">Dashboard</Link>
               </li>
               <li>
                 <Link to="/tasks">Tasks</Link>
               </li>
+            </ul>
+          )}
+          {!isAuthenticated && (
+            <ul className="navbar-links">
+              <li>
+                <Link to="/login">Login</Link>
+              </li>
+              <li>
+                <Link to="/register">Register</Link>
+              </li>
+            </ul>
+          )}
+        </div>
+
+        <div className="navbar-section navbar-section-right">
+          {isAuthenticated && (
+            <ul className="navbar-links">
               <li>
                 <button 
                   className="customize-btn"
@@ -48,22 +68,13 @@ const Navbar: React.FC = () => {
                   Logout
                 </button>
               </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-              <li>
-                <Link to="/register">Register</Link>
-              </li>
-            </>
+            </ul>
           )}
-        </ul>
+        </div>
       </div>
-      <CustomizationSidebar 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+      <CustomizationSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
     </nav>
   );

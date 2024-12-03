@@ -8,6 +8,23 @@ require("dotenv").config();
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Authentication middleware
+const auth = async (req, res, next) => {
+  try {
+    const token = req.header("x-auth-token");
+    if (!token) {
+      return res.status(401).json({ error: "No token, authorization denied" });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error("Authentication Error:", err);
+    res.status(401).json({ error: "Invalid token" });
+  }
+};
+
 // Register User
 router.post(
   "/register",
@@ -116,7 +133,7 @@ router.post(
 );
 
 // Verify Token
-router.get("/verify", async (req, res) => {
+router.get("/verify", auth, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
       attributes: ['id', 'email']
@@ -132,15 +149,9 @@ router.get("/verify", async (req, res) => {
 });
 
 // Get current user
-router.get("/user", async (req, res) => {
+router.get("/user", auth, async (req, res) => {
   try {
-    const token = req.header("x-auth-token");
-    if (!token) {
-      return res.status(401).json({ error: "No token, authorization denied" });
-    }
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findByPk(decoded.id, {
+    const user = await User.findByPk(req.user.id, {
       attributes: { exclude: ["password"] },
     });
 

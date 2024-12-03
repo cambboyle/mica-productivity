@@ -48,20 +48,20 @@
 }
 
 .primary-button {
-  background-color: #4a90e2;
+  background-color: var(--accent-color, #6366f1);
   color: white;
   border: none;
 }
 
 .primary-button:hover {
-  background-color: #357abd;
+  background-color: var(--accent-hover, #5152c5);
   transform: translateY(-1px);
 }
 
 .secondary-button {
   background-color: white;
-  color: #4a90e2;
-  border: 2px solid #4a90e2;
+  color: var(--accent-color, #6366f1);
+  border: 2px solid var(--accent-color, #6366f1);
 }
 
 .secondary-button:hover {
@@ -79,6 +79,52 @@
   font-size: 1.25rem;
   color: #4a5568;
   margin-bottom: 1.5rem;
+}
+
+.hero-section {
+  background: url('https://via.placeholder.com/1500x500') no-repeat center center;
+  background-size: cover;
+  padding: 5rem 2rem;
+  text-align: center;
+  color: white;
+}
+
+.hero-title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.features-section {
+  padding: 3rem 2rem;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.features-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.features-section ul {
+  list-style: none;
+  padding: 0;
+  font-size: 1.25rem;
+  color: #4a5568;
+}
+
+.features-section li {
+  margin-bottom: 0.5rem;
 }
 
 @media (max-width: 640px) {
