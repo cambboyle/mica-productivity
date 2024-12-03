@@ -4,11 +4,12 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node -r dotenv/config src/server.js",
     "dev": "nodemon src/server.js"
   },
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "npm": "9.x"
   },
   "keywords": [],
   "author": "",
