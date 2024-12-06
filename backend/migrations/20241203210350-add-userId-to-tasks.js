@@ -3,17 +3,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('Tasks', 'userId', {
-      type: Sequelize.UUID,
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    });
+    const tableDescription = await queryInterface.describeTable('Tasks');
+    if (!tableDescription.userId) {
+      await queryInterface.addColumn('Tasks', 'userId', {
+        type: Sequelize.UUID,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      });
+    }
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn('Tasks', 'userId');
+    const tableDescription = await queryInterface.describeTable('Tasks');
+    if (tableDescription.userId) {
+      await queryInterface.removeColumn('Tasks', 'userId');
+    }
   }
 };

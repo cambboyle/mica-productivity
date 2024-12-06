@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/database");
+const sequelize = require("../config/database");
 const User = require("./User");
 
 const Task = sequelize.define(
@@ -13,7 +13,6 @@ const Task = sequelize.define(
     userId: {
       type: DataTypes.UUID,
       allowNull: false,
-      field: 'userId',
       references: {
         model: 'Users',
         key: 'id'
@@ -27,19 +26,27 @@ const Task = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    priority: {
-      type: DataTypes.ENUM("low", "medium", "high"),
-      allowNull: false,
-      defaultValue: "medium",
-    },
     dueDate: {
       type: DataTypes.DATE,
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM("todo", "in_progress", "done"),
+      type: DataTypes.ENUM("todo", "done"),
       allowNull: false,
       defaultValue: "todo",
+    },
+    isRecurring: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    recurringSchedule: {
+      type: DataTypes.ENUM("daily", "weekly", "monthly"),
+      allowNull: true,
+    },
+    reminder: {
+      type: DataTypes.DATE,
+      allowNull: true,
     }
   },
   {
@@ -49,13 +56,7 @@ const Task = sequelize.define(
 );
 
 // Define the association
-Task.belongsTo(User, {
-  foreignKey: {
-    name: 'userId',
-    field: 'userId'
-  },
-  as: 'user',
-  constraints: true
-});
+Task.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Task, { foreignKey: 'userId' });
 
 module.exports = Task;

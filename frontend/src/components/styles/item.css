@@ -1,10 +1,10 @@
 .task-item {
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease;
 }
 
 .task-item:hover {
@@ -85,3 +85,50 @@
 .bg-gray-100 { background-color: #f3f4f6; }
 .text-gray-800 { color: #1f2937; }
 
+.task-status-select {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: white;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.task-status-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.task-item.success {
+  animation: successPulse 2s ease;
+}
+
+.task-item.error {
+  animation: errorPulse 2s ease;
+}
+
+@keyframes successPulse {
+  0% {
+    background-color: #ffffff;
+  }
+  50% {
+    background-color: rgba(72, 187, 120, 0.2);
+  }
+  100% {
+    background-color: #ffffff;
+  }
+}
+
+@keyframes errorPulse {
+  0% {
+    background-color: #ffffff;
+  }
+  50% {
+    background-color: rgba(245, 101, 101, 0.2);
+  }
+  100% {
+    background-color: #ffffff;
+  }
+}

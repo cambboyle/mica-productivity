@@ -1,13 +1,14 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
-import CustomizationSidebar from "./CustomizationSidebar";
+import CustomizationDropdown from "./CustomizationDropdown";
 import "./styles/navbar.css";
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const customizeButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleLogout = () => {
     logout();
@@ -34,6 +35,9 @@ const Navbar: React.FC = () => {
               <li>
                 <Link to="/tasks">Tasks</Link>
               </li>
+              <li>
+                <Link to="/projects">Projects</Link>
+              </li>
             </ul>
           )}
           {!isAuthenticated && (
@@ -53,8 +57,9 @@ const Navbar: React.FC = () => {
             <ul className="navbar-links">
               <li>
                 <button 
+                  ref={customizeButtonRef}
                   className="customize-btn"
-                  onClick={() => setIsSidebarOpen(true)}
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   title="Customize Theme"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -72,9 +77,10 @@ const Navbar: React.FC = () => {
           )}
         </div>
       </div>
-      <CustomizationSidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
+      <CustomizationDropdown
+        isOpen={isDropdownOpen}
+        onClose={() => setIsDropdownOpen(false)}
+        anchorRef={customizeButtonRef}
       />
     </nav>
   );

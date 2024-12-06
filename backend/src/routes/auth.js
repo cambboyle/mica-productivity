@@ -25,6 +25,24 @@ const auth = async (req, res, next) => {
   }
 };
 
+// Verify token and get user
+router.get("/verify", auth, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ['id', 'email']
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error("Error in verify endpoint:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Register User
 router.post(
   "/register",
@@ -137,22 +155,6 @@ router.post(
     }
   }
 );
-
-// Verify Token
-router.get("/verify", auth, async (req, res) => {
-  try {
-    const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'email']
-    });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    res.json({ user });
-  } catch (err) {
-    console.error("Verification Error:", err);
-    res.status(500).json({ error: "Server error during verification" });
-  }
-});
 
 // Get current user
 router.get("/user", auth, async (req, res) => {

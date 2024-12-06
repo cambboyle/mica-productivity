@@ -1,46 +1,44 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/database");
-const User = require("./User");
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const UserPreferences = sequelize.define(
-  "UserPreferences",
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      unique: true,
-      field: 'userId',
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onDelete: 'CASCADE'
-    },
-    accentColor: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "#6366f1", // Default indigo color
-    },
+class UserPreferences extends Model {}
+
+UserPreferences.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-  {
-    tableName: "user_preferences",
-    underscored: false,
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id'
+    },
+    unique: true
+  },
+  accentColor: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: '#6366f1'
+  },
+  colorPresets: {
+    type: DataTypes.JSONB,  // Using JSONB for better performance
+    allowNull: false,
+    defaultValue: [],
+    get() {
+      const rawValue = this.getDataValue('colorPresets');
+      return rawValue ? (Array.isArray(rawValue) ? rawValue : []) : [];
+    },
+    set(value) {
+      this.setDataValue('colorPresets', Array.isArray(value) ? value : []);
+    }
   }
-);
-
-// Define the association
-UserPreferences.belongsTo(User, {
-  foreignKey: {
-    name: 'userId',
-    field: 'userId'
-  },
-  as: 'user',
-  constraints: true
+}, {
+  sequelize,
+  modelName: 'UserPreferences',
+  tableName: 'user_preferences'
 });
 
 module.exports = UserPreferences;

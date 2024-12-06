@@ -1,46 +1,81 @@
-import React from "react";
+import React, { useState } from "react";
 import "./styles/item.css";
 import "../index.css";
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: "low" | "medium" | "high";
-  status: "todo" | "in_progress" | "done";
-}
+import { Task } from "../types/Task";
 
 interface TaskItemProps {
   task: Task;
-  handleEdit: (task: Task) => void;
+  onEdit: (task: Task) => void;
+  onStatusChange: (taskId: string, newStatus: "todo" | "in_progress" | "done") => Promise<void>;
+  onDelete: (taskId: string) => Promise<void>;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, handleEdit }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onStatusChange, onDelete }) => {
+  const [updateStatus, setUpdateStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const formattedDate = task.dueDate
     ? new Date(task.dueDate).toLocaleDateString()
     : "";
 
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = e.target.value as Task["status"];
+    setUpdateStatus('idle'); // Reset status before new attempt
+    
+    try {
+      await onStatusChange(task.id, newStatus);
+      setUpdateStatus('success');
+      setTimeout(() => setUpdateStatus('idle'), 2000);
+    } catch (error) {
+      setUpdateStatus('error');
+      setTimeout(() => setUpdateStatus('idle'), 2000);
+    }
+  };
+
+  const getItemClassName = () => {
+    const baseClass = 'task-item';
+    if (updateStatus === 'success') return `${baseClass} success`;
+    if (updateStatus === 'error') return `${baseClass} error`;
+    return baseClass;
+  };
+
   return (
-    <div className={`task-item ${task.status === "done" ? "task-completed" : ""}`}>
-      <div className="task-item-header">
-        <div className="task-item-badges">
-          <span className={`task-item-priority ${getPriorityColor(task.priority)}`}>
-            {task.priority}
-          </span>
-          <span className={`task-item-status ${getStatusColor(task.status)}`}>
-            {formatStatus(task.status)}
-          </span>
-        </div>
-        <span className="task-item-date">{formattedDate}</span>
+    <div className={getItemClassName()}>
+      <div className="task-header">
+        <h3 className="task-title">{task.title}</h3>
+        <button
+          className="task-action-button edit-button"
+          onClick={() => onEdit(task)}
+        >
+          Edit
+        </button>
+        <button
+          className="task-action-button delete-button"
+          onClick={() => onDelete(task.id)}
+        >
+          Delete
+        </button>
       </div>
-      <h3 className="task-item-title">{task.title}</h3>
-      <p className="task-item-description">
-        {task.description || "No description"}
-      </p>
-      <button onClick={() => handleEdit(task)} className="button">
-        Edit
-      </button>
+
+      {task.description && (
+        <p className="task-description">{task.description}</p>
+      )}
+
+      <div className="task-meta">
+        <span className="task-due-date">
+          Due: {formattedDate}
+        </span>
+        <span className={`task-badge priority-${task.priority}`}>
+          {task.priority}
+        </span>
+        <select
+          value={task.status}
+          onChange={handleStatusChange}
+          className="status-select"
+        >
+          <option value="todo">Todo</option>
+          <option value="in_progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
     </div>
   );
 };
