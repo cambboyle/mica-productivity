@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect, useCallback, useMemo } from "react";
 import api from "../services/api";
 
 interface User {
@@ -15,7 +15,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   token: null,
   user: null,
@@ -34,96 +34,90 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
   const [user, setUser] = useState<User | null>(null);
 
-  // Initialize auth state from localStorage
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      const verifyToken = async () => {
-        try {
-          setAuthToken(storedToken);
-          const response = await api.get("/auth/verify");
-          setUser(response.data.user);
-          setToken(storedToken);
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error("Token verification failed:", error);
-          logout();
-        }
-      };
-      verifyToken();
+  const setAuthToken = useCallback((token: string | null) => {
+    if (token) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      localStorage.setItem("token", token);
+    } else {
+      delete api.defaults.headers.common["Authorization"];
+      localStorage.removeItem("token");
     }
   }, []);
 
-  const setAuthToken = (token: string | null) => {
+  const verifyToken = useCallback(async (storedToken: string) => {
+    try {
+      setAuthToken(storedToken);
+      const response = await api.get("/auth/verify");
+      setUser(response.data.user);
+      setToken(storedToken);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      setAuthToken(null);
+      setUser(null);
+      setToken(null);
+      setIsAuthenticated(false);
+    }
+  }, [setAuthToken]);
+
+  useEffect(() => {
     if (token) {
-      api.defaults.headers.common["x-auth-token"] = token;
-      localStorage.setItem("token", token);
-    } else {
-      delete api.defaults.headers.common["x-auth-token"];
-      localStorage.removeItem("token");
+      verifyToken(token);
     }
-  };
+  }, [token, verifyToken]);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
-      const response = await api.post("/auth/login", {
-        email,
-        password,
-      });
+      const response = await api.post("/auth/login", { email, password });
       const { token: newToken, user: userData } = response.data;
       setAuthToken(newToken);
-      setToken(newToken);
       setUser(userData);
+      setToken(newToken);
       setIsAuthenticated(true);
-    } catch (error: any) {
-      if (error.response?.data?.error) {
-        throw new Error(error.response.data.error);
-      }
-      throw new Error("Login failed. Please try again.");
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error;
     }
-  };
+  }, [setAuthToken]);
 
-  const register = async (email: string, password: string) => {
+  const register = useCallback(async (email: string, password: string) => {
     try {
-      const response = await api.post("/auth/register", {
-        email,
-        password,
-      });
+      const response = await api.post("/auth/register", { email, password });
       const { token: newToken, user: userData } = response.data;
       setAuthToken(newToken);
-      setToken(newToken);
       setUser(userData);
+      setToken(newToken);
       setIsAuthenticated(true);
-    } catch (error: any) {
-      if (error.response?.data?.error) {
-        throw new Error(error.response.data.error);
-      }
-      throw new Error("Registration failed. Please try again.");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      throw error;
     }
-  };
+  }, [setAuthToken]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setAuthToken(null);
-    setToken(null);
     setUser(null);
+    setToken(null);
     setIsAuthenticated(false);
-  };
+  }, [setAuthToken]);
+
+  const value = useMemo(() => ({
+    isAuthenticated,
+    token,
+    user,
+    login,
+    register,
+    logout
+  }), [isAuthenticated, token, user, login, register, logout]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        token,
-        user,
-        login,
-        register,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export { AuthContext };

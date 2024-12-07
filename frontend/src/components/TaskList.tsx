@@ -2,7 +2,7 @@
 import React from "react";
 import TaskItem from "./TaskItem";
 import { Task } from "../types/Task";
-import "../index.css";
+import "./styles/task_list.css";
 
 interface TaskListProps {
   tasks: Task[];
@@ -24,7 +24,9 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onEdit, onStatusChange, onDe
         />
       ))}
       {tasks.length === 0 && (
-        <p className="empty-state">No tasks found</p>
+        <div className="empty-state">
+          <p>No tasks found. Create a new task to get started!</p>
+        </div>
       )}
     </div>
   );

@@ -2,9 +2,7 @@ import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from 'react-toastify';
 import { Task } from "../types/Task";
-import "../styles/common.css";
 import "./styles/task_form.css";
-import "../index.css";
 
 type TaskFormData = Omit<Task, "id" | "userId">;
 
@@ -189,7 +187,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               Cancel
             </button>
             <button type="submit" className="button button-primary">
-              {task ? "Update Task" : "Create Task"}
+              {'id' in task ? "Update Task" : "Create Task"}
             </button>
           </div>
         </div>

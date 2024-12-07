@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import './styles/CustomizationDropdown.css';
@@ -20,13 +20,29 @@ const DEFAULT_COLOR = '#6366f1';
 const CustomizationDropdown: React.FC<CustomizationDropdownProps> = ({ isOpen, onClose, anchorRef }) => {
   const [accentColor, setAccentColor] = useState(DEFAULT_COLOR);
   const [presets, setPresets] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated, user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Load preferences from localStorage
-  const loadLocalPreferences = (): Preferences | null => {
+  const updateDocumentColors = useCallback((color: string) => {
+    document.documentElement.style.setProperty('--accent-color', color);
+    document.documentElement.style.setProperty('--accent-color-hover', `${color}dd`);
+    document.documentElement.style.setProperty('--accent-color-light', `${color}33`);
+    document.documentElement.style.setProperty('--accent-color-10', `${color}1a`);
+    document.documentElement.style.setProperty('--button-text-color', '#ffffff');
+
+    // Calculate contrast color for text
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    
+    if (brightness > 128) {
+      document.documentElement.style.setProperty('--button-text-color', '#1f2937');
+    }
+  }, []);
+
+  const loadLocalPreferences = useCallback((): Preferences | null => {
     if (!user?.id) return null;
     
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -39,10 +55,9 @@ const CustomizationDropdown: React.FC<CustomizationDropdownProps> = ({ isOpen, o
       }
     }
     return null;
-  };
+  }, [user?.id]);
 
-  // Save preferences to localStorage
-  const saveLocalPreferences = (prefs: Preferences) => {
+  const saveLocalPreferences = useCallback((prefs: Preferences) => {
     if (!user?.id) return;
     
     try {
@@ -53,35 +68,9 @@ const CustomizationDropdown: React.FC<CustomizationDropdownProps> = ({ isOpen, o
     } catch (e) {
       console.error('Error saving preferences to localStorage:', e);
     }
-  };
+  }, [user?.id]);
 
-  useEffect(() => {
-    if (isAuthenticated && user?.id) {
-      fetchPreferences();
-    }
-  }, [isAuthenticated, user?.id]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        anchorRef.current &&
-        !anchorRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose]);
-
-  const fetchPreferences = async () => {
+  const fetchPreferences = useCallback(async () => {
     try {
       setError(null);
       // First try to load from localStorage
@@ -113,12 +102,10 @@ const CustomizationDropdown: React.FC<CustomizationDropdownProps> = ({ isOpen, o
       if (!localPrefs) {
         updateDocumentColors(DEFAULT_COLOR);
       }
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [loadLocalPreferences, saveLocalPreferences, updateDocumentColors]);
 
-  const handleColorChange = async (color: string) => {
+  const handleColorChange = useCallback(async (color: string) => {
     try {
       setError(null);
       setAccentColor(color);
@@ -133,9 +120,9 @@ const CustomizationDropdown: React.FC<CustomizationDropdownProps> = ({ isOpen, o
       const errorMessage = error.response?.data?.error || 'Failed to save preferences';
       setError(errorMessage);
     }
-  };
+  }, [presets, saveLocalPreferences, updateDocumentColors]);
 
-  const handleSavePreset = async () => {
+  const handleSavePreset = useCallback(async () => {
     try {
       setError(null);
       if (presets.includes(accentColor)) {
@@ -154,9 +141,9 @@ const CustomizationDropdown: React.FC<CustomizationDropdownProps> = ({ isOpen, o
       const errorMessage = error.response?.data?.error || 'Failed to save preset';
       setError(errorMessage);
     }
-  };
+  }, [accentColor, presets, saveLocalPreferences]);
 
-  const handleRemovePreset = async (colorToRemove: string) => {
+  const handleRemovePreset = useCallback(async (colorToRemove: string) => {
     try {
       setError(null);
       const newPresets = presets.filter(color => color !== colorToRemove);
@@ -171,28 +158,33 @@ const CustomizationDropdown: React.FC<CustomizationDropdownProps> = ({ isOpen, o
       const errorMessage = error.response?.data?.error || 'Failed to remove preset';
       setError(errorMessage);
     }
-  };
+  }, [accentColor, presets, saveLocalPreferences]);
 
-  const updateDocumentColors = (color: string) => {
-    document.documentElement.style.setProperty('--accent-color', color);
-    const hoverColor = adjustColorBrightness(color, -10);
-    document.documentElement.style.setProperty('--accent-hover', hoverColor);
-  };
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      fetchPreferences();
+    }
+  }, [isAuthenticated, user?.id, fetchPreferences]);
 
-  const adjustColorBrightness = (hex: string, percent: number) => {
-    const num = parseInt(hex.replace('#', ''), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = (num >> 16) + amt;
-    const G = (num >> 8 & 0x00FF) + amt;
-    const B = (num & 0x0000FF) + amt;
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        anchorRef.current &&
+        !anchorRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
 
-    return '#' + (
-      0x1000000 +
-      (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
-      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
-      (B < 255 ? (B < 1 ? 0 : B) : 255)
-    ).toString(16).slice(1);
-  };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose, anchorRef]);
 
   const predefinedColors = [
     '#6366f1', // Indigo

@@ -7,7 +7,7 @@ const sequelize = new Sequelize({
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 5432,
   username: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASS,
   database: process.env.DB_NAME || 'mica_productivity',
   logging: false, // Set to console.log to see SQL queries
   dialectOptions: {
@@ -29,6 +29,8 @@ async function testConnection() {
   try {
     await sequelize.authenticate();
     console.log('Database connection has been established successfully.');
+    await sequelize.sync();
+    console.log('Database synchronized successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }

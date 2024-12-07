@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
-const PrivateRoute = ({ children }: { // noinspection JSDeprecatedSymbols
+const PrivateRoute = ({ children }: { 
   children: JSX.Element }) => {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated } = useAuth();
 
   return isAuthenticated ? children : <Navigate to="/login" />;
 };

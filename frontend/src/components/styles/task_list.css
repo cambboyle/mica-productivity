@@ -1,0 +1,20 @@
+.task-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--background-color);
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin: 0;
+}

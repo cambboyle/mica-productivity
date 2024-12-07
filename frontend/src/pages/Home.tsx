@@ -11,7 +11,7 @@ const Home: React.FC = () => {
     const fetchPreferences = async () => {
       if (isAuthenticated && user) {
         try {
-          const response = await api.get(`/preferences`);
+          await api.get(`/preferences`);
           // The CSS variables are now managed by CustomizationSidebar
           // We don't need to set them here anymore
         } catch (error) {

@@ -10,6 +10,19 @@ interface TaskItemProps {
   onDelete: (taskId: string) => Promise<void>;
 }
 
+const formatStatus = (status: string): string => {
+  switch (status) {
+    case "todo":
+      return "To Do";
+    case "in_progress":
+      return "In Progress";
+    case "done":
+      return "Done";
+    default:
+      return status;
+  }
+};
+
 const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onStatusChange, onDelete }) => {
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const formattedDate = task.dueDate
@@ -69,50 +82,15 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onStatusChange, onDel
         <select
           value={task.status}
           onChange={handleStatusChange}
-          className="status-select"
+          className={`status-select status-${task.status}`}
         >
-          <option value="todo">Todo</option>
-          <option value="in_progress">In Progress</option>
-          <option value="done">Done</option>
+          <option value="todo">{formatStatus("todo")}</option>
+          <option value="in_progress">{formatStatus("in_progress")}</option>
+          <option value="done">{formatStatus("done")}</option>
         </select>
       </div>
     </div>
   );
 };
-
-function getPriorityColor(priority: "low" | "medium" | "high"): string {
-  switch (priority) {
-    case "high":
-      return "bg-red-100 text-red-800";
-    case "medium":
-      return "bg-yellow-100 text-yellow-800";
-    case "low":
-      return "bg-green-100 text-green-800";
-  }
-}
-
-function getStatusColor(status: "todo" | "in_progress" | "done"): string {
-  switch (status) {
-    case "todo":
-      return "bg-gray-100 text-gray-800";
-    case "in_progress":
-      return "bg-blue-100 text-blue-800";
-    case "done":
-      return "bg-green-100 text-green-800";
-  }
-}
-
-function formatStatus(status: string): string {
-  switch (status) {
-    case "todo":
-      return "To Do";
-    case "in_progress":
-      return "In Progress";
-    case "done":
-      return "Done";
-    default:
-      return status;
-  }
-}
 
 export default TaskItem;

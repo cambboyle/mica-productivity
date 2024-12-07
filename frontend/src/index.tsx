@@ -1,16 +1,26 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import "./styles/globals.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
+// Add loading spinner component
+const LoadingSpinner = () => (
+  <div className="loading-spinner">
+    <div className="spinner"></div>
+  </div>
+);
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <App />
+    <Suspense fallback={<LoadingSpinner />}>
+      <App />
+    </Suspense>
   </React.StrictMode>
 );
 

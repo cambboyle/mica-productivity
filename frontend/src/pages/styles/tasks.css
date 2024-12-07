@@ -1,7 +1,5 @@
 .tasks-container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  composes: container from '../../styles/common.css';
 }
 
 .tasks-header {
@@ -20,7 +18,7 @@
 .header-content h1 {
   font-size: 1.875rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -31,23 +29,25 @@
 
 .view-button {
   padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--background-color);
   cursor: pointer;
   transition: all 0.2s ease;
+  color: var(--text-color);
 }
 
 .view-button.active {
-  background: #007bff;
+  background: var(--accent-color);
   color: white;
-  border-color: #0056b3;
+  border-color: var(--accent-color);
 }
 
 .filters {
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .filter-group {
@@ -59,16 +59,16 @@
 .filter-group label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
 .filter-select {
-  padding: 6px 12px;
+  padding: 8px 12px;
   font-size: 0.875rem;
-  color: #1f2937;
-  background-color: #ffffff;
-  border: 1px solid #d1d5db;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   min-width: 140px;
   cursor: pointer;
@@ -76,31 +76,17 @@
 }
 
 .filter-select:hover {
-  border-color: #9ca3af;
+  border-color: var(--border-hover-color);
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.filters-container {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.filters-container select {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  min-width: 150px;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-color-10);
 }
 
 .tasks-content {
-  background: white;
+  background: var(--background-color);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
@@ -114,14 +100,14 @@
 
 .task-item {
   padding: 1rem;
-  background: white;
+  background: var(--background-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .task-item:hover {
-  background-color: var(--background-color);
+  background-color: var(--background-color-hover);
   transform: translateX(4px);
 }
 
@@ -135,7 +121,7 @@
 .task-title {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -185,12 +171,12 @@
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .task-description {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   margin: 0.5rem 0;
 }
 
@@ -221,24 +207,48 @@
   opacity: 0.7;
 }
 
-.add-task-button {
-  padding: 0.5rem 1rem;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
+.create-task-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--button-text-color, white);
+  background-color: var(--accent-color);
+  border: 1px solid transparent;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.add-task-button:hover {
-  background: #218838;
+.create-task-btn:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.create-task-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.create-task-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-color-10);
+}
+
+.create-task-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .new-task-form {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: white;
+  background: var(--background-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
 }
@@ -251,7 +261,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
-  color: var(--text-primary);
+  color: var(--text-color);
 }
 
 .form-control {
@@ -264,8 +274,8 @@
 
 .form-control:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-color-10);
 }
 
 .form-buttons {
@@ -308,7 +318,7 @@
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .modal {
@@ -325,7 +335,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--background-color);
   padding: 2rem;
   border-radius: 8px;
   width: 90%;
@@ -342,7 +352,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--background-color);
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -350,7 +360,7 @@
 
 .stat-card h3 {
   margin: 0 0 1rem 0;
-  color: #2d3748;
+  color: var(--text-color);
   font-size: 1.25rem;
 }
 
@@ -365,17 +375,17 @@
   align-items: center;
   padding: 0.5rem;
   border-radius: 4px;
-  background: #f7fafc;
+  background: var(--background-color);
 }
 
 .stat-label {
-  color: #4a5568;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
 .stat-value {
   font-weight: 600;
-  color: #2d3748;
+  color: var(--text-color);
 }
 
 .priority-high .stat-value {
@@ -383,11 +393,11 @@
 }
 
 .priority-medium .stat-value {
-  color: #d69e2e;
+  color: #d97706;
 }
 
 .priority-low .stat-value {
-  color: #38a169;
+  color: #059669;
 }
 
 .overdue .stat-value {
@@ -395,7 +405,7 @@
 }
 
 .today .stat-value {
-  color: #d69e2e;
+  color: #d97706;
 }
 
 .tomorrow .stat-value {
