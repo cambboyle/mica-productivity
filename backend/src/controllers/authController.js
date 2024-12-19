@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // Assuming you have a User model
+const User = require("../models/User");
+const { seedDatabase } = require('../seeders');
 
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -16,12 +17,58 @@ const registerUser = async (req, res) => {
     });
 
     await newUser.save();
+
+    // Seed example projects for the new user
+    try {
+      await seedDatabase(newUser.id);
+    } catch (seedError) {
+      console.error('Error seeding example projects:', seedError);
+      // Don't fail registration if seeding fails
+    }
+
     res
       .status(201)
       .json({ message: "User registered successfully", email: newUser.email });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error registering user" });
+  }
+};
+
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+
+    // Return user info and token
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: "Error logging in" });
   }
 };
 
@@ -32,16 +79,16 @@ const getUserData = async (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
-    const user = await User.findById(decoded.id).select("-password"); // Fetch user data without password
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ email: user.email }); // Return the user's email
+    res.json({ email: user.email });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-module.exports = { registerUser, getUserData };
+module.exports = { registerUser, loginUser, getUserData };

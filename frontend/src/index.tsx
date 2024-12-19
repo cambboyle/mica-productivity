@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import "./styles/globals.css";
+import "./styles/global.css"; // Import global styles
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 

@@ -6,6 +6,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Home from './pages/Home';
+import Projects from './pages/Projects';
+import ProjectDetails from './pages/ProjectDetails';
 import Navbar from './components/Navbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -52,11 +54,11 @@ const WelcomePage = () => {
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="app">
           <Navbar />
-          <main className="main-content">
+          <div className="content">
             <Routes>
               <Route path="/" element={<WelcomePage />} />
               <Route path="/login" element={<Login />} />
@@ -64,10 +66,12 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/home" element={<Home />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/project/:id" element={<ProjectDetails />} />
             </Routes>
-          </main>
+          </div>
           <ToastContainer
-            position="top-right"
+            position="bottom-right"
             autoClose={3000}
             hideProgressBar={false}
             newestOnTop
@@ -79,8 +83,8 @@ const App = () => {
             theme="light"
           />
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 };
 

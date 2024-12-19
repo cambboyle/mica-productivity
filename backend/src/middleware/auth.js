@@ -3,14 +3,17 @@ require('dotenv').config();
 
 const auth = (req, res, next) => {
   // Get token from header
-  const token = req.header('x-auth-token');
+  const authHeader = req.header('Authorization');
 
   // Check if no token
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'No token, authorization denied' });
   }
 
   try {
+    // Extract token from Bearer string
+    const token = authHeader.split(' ')[1];
+    
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
