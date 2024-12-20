@@ -8,6 +8,7 @@ import Tasks from './pages/Tasks';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
 import ProjectDetails from './pages/ProjectDetails';
+import Notes from './pages/Notes';
 import Navbar from './components/Navbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -68,6 +69,7 @@ const App = () => {
               <Route path="/home" element={<Home />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/project/:id" element={<ProjectDetails />} />
+              <Route path="/notes" element={<Notes />} />
             </Routes>
           </div>
           <ToastContainer

@@ -6,6 +6,8 @@ const auth = require("./middleware/auth");
 const projectRoutes = require("./routes/projects");
 const projectTaskRoutes = require("./routes/projectTasks");
 const authRoutes = require("./routes/auth");
+const noteRoutes = require("./routes/notes");
+const preferencesRoutes = require("./routes/preferences");
 const { validate } = require('uuid');
 
 // Middleware for JSON request body parsing
@@ -26,7 +28,7 @@ app.use(cors({
 
 // UUID validation middleware
 const validateUUID = (req, res, next) => {
-  const { projectId, taskId } = req.params;
+  const { projectId, taskId, noteId } = req.params;
   
   if (projectId && !validate(projectId)) {
     return res.status(400).json({ error: 'Invalid project ID format' });
@@ -34,6 +36,10 @@ const validateUUID = (req, res, next) => {
   
   if (taskId && !validate(taskId)) {
     return res.status(400).json({ error: 'Invalid task ID format' });
+  }
+
+  if (noteId && !validate(noteId)) {
+    return res.status(400).json({ error: 'Invalid note ID format' });
   }
   
   next();
@@ -49,7 +55,13 @@ app.use("/api/auth", authRoutes);
 
 // Project and task routes
 app.use("/api", [validateUUID], projectRoutes);
-app.use("/api", [validateUUID], projectTaskRoutes);
+app.use("/api/projects", [validateUUID], projectTaskRoutes);
+
+// Notes routes
+app.use("/api/notes", [validateUUID], noteRoutes);
+
+// Preferences routes (no UUID validation needed)
+app.use("/api/preferences", preferencesRoutes);
 
 // Apply auth middleware to the /api/tasks route
 app.get("/api/tasks", auth, async (req, res) => {
@@ -67,7 +79,7 @@ app.get("/api/tasks", auth, async (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: "Something broke!" });
+  res.status(500).json({ message: 'Something went wrong!' });
 });
 
 module.exports = app;

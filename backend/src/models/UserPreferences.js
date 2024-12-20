@@ -1,44 +1,50 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+'use strict';
 
-class UserPreferences extends Model {}
-
-UserPreferences.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  userId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: 'Users',
-      key: 'id'
+module.exports = (sequelize, DataTypes) => {
+  const UserPreferences = sequelize.define('UserPreferences', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false
     },
-    unique: true
-  },
-  accentColor: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: '#6366f1'
-  },
-  colorPresets: {
-    type: DataTypes.JSONB,  // Using JSONB for better performance
-    allowNull: false,
-    defaultValue: [],
-    get() {
-      const rawValue = this.getDataValue('colorPresets');
-      return rawValue ? (Array.isArray(rawValue) ? rawValue : []) : [];
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      unique: true
     },
-    set(value) {
-      this.setDataValue('colorPresets', Array.isArray(value) ? value : []);
+    accentColor: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: '#6366f1'
+    },
+    colorPresets: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: [],
+      get() {
+        const rawValue = this.getDataValue('colorPresets');
+        return rawValue ? (Array.isArray(rawValue) ? rawValue : []) : [];
+      },
+      set(value) {
+        this.setDataValue('colorPresets', Array.isArray(value) ? value : []);
+      }
     }
-  }
-}, {
-  sequelize,
-  modelName: 'UserPreferences',
-  tableName: 'user_preferences'
-});
+  }, {
+    tableName: 'user_preferences',
+    timestamps: true
+  });
 
-module.exports = UserPreferences;
+  UserPreferences.associate = function(models) {
+    UserPreferences.belongsTo(models.User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+  };
+
+  return UserPreferences;
+};

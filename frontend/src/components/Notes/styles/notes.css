@@ -1,0 +1,387 @@
+.notes-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notes-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.search-bar {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--background-alt);
+}
+
+.controls-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.project-select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--background-alt);
+}
+
+.tags-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tag-button {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--background-alt);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-button.active {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.note-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.note-card {
+  background: var(--background-alt);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.note-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.note-icon {
+  font-size: 1.25rem;
+}
+
+.note-card-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.favorite-icon {
+  color: #FFB800;
+}
+
+.note-card-preview {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.note-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tag {
+  padding: 0.25rem 0.5rem;
+  background: var(--background-hover);
+  border-radius: 999px;
+  font-size: 0.875rem;
+}
+
+.project-tag {
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent-color);
+}
+
+.task-tag {
+  background: rgba(72, 187, 120, 0.1);
+  color: #48BB78;
+}
+
+.note-card-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+/* Note Editor */
+.note-editor {
+  background: var(--background-color);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.note-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.note-title {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1.25rem;
+  border: none;
+  background: transparent;
+}
+
+.note-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-button {
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.icon-button:hover {
+  background: var(--background-hover);
+}
+
+.icon-button.active {
+  color: var(--accent-color);
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tag-input {
+  border: none;
+  background: transparent;
+  padding: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.tag-remove {
+  margin-left: 0.25rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.tag-remove:hover {
+  opacity: 1;
+}
+
+/* Linked Items */
+.linked-items {
+  margin-top: 0.5rem;
+}
+
+.linked-items h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.linked-items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Dialogs */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: var(--background-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.dialog-title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.dialog-content {
+  margin-bottom: 1.5rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Pickers */
+.picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.picker {
+  background: var(--background-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.picker-title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.picker-filters {
+  margin-bottom: 1rem;
+}
+
+.picker-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.picker-item:hover {
+  background: var(--background-hover);
+}
+
+.picker-item-project {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.picker-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Project and Task Links in Notes */
+.note-links {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.note-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-decoration: none;
+  color: var(--text-color);
+  background: var(--background-alt);
+  transition: background-color 0.2s;
+}
+
+.note-link:hover {
+  background: var(--background-hover);
+}
+
+.note-link-project {
+  border: 1px solid var(--accent-color);
+}
+
+.note-link-task {
+  border: 1px solid #48BB78;
+}

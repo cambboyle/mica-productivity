@@ -38,6 +38,9 @@ const Navbar: React.FC = () => {
               <li>
                 <Link to="/projects">Projects</Link>
               </li>
+              <li>
+                <Link to="/notes">Notes</Link>
+              </li>
             </ul>
           )}
           {!isAuthenticated && (

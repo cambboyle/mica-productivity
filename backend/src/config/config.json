@@ -1,0 +1,28 @@
+{
+  "development": {
+    "username": "task_app_user",
+    "password": "MicaAli090800!",
+    "database": "task_manager",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "task_app_user",
+    "password": "MicaAli090800!",
+    "database": "task_manager_test",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
+require('dotenv').config();
+
 const { Sequelize } = require('sequelize');
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 if (!process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_NAME) {
   console.error('Missing required environment variables:');
@@ -27,6 +28,30 @@ const config = {
       min: 0,
       acquire: 30000,
       idle: 10000
+    }
+  },
+  test: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: 'localhost',
+    port: 5432,
+    dialect: 'postgres',
+    logging: false
+  },
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    dialect: 'postgres',
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
     }
   }
 };
@@ -67,4 +92,4 @@ testConnection();
 
 // Export both the Sequelize instance and the config
 module.exports = sequelize;
-module.exports.config = config.development;
+module.exports.config = config;
